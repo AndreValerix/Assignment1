@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exam Quiz</title>
+  <style>
+    .question {
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+    .choices {
+      list-style-type: none;
+      padding: 0;
+    }
+    .choice {
+      margin-bottom: 5px;
+    }
+    .score {
+      font-size: 1.2em;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Exam Quiz</h1>
+  <div id="quiz-container"></div>
+  <script>
+    class Question {
+      constructor(text, choices, answer) {
+        this.text = text;
+        this.choices = choices;
+        this.answer = answer;
+      }
+
+      isCorrectAnswer(choice) {
+        return this.answer === choice;
+      }
+    }
+
+    class Quiz {
+      constructor(questions) {
+        this.questions = questions;
+        this.score = 0;
+        this.currentQuestionIndex = 0;
+      }
+
+      getCurrentQuestion() {
+        return this.questions[this.currentQuestionIndex];
+      }
+
+      guess(choice) {
+        const currentQuestion = this.getCurrentQuestion();
+        if (currentQuestion.isCorrectAnswer(choice)) {
+          this.score++;
+        }
+        this.currentQuestionIndex++;
+      }
+
+      isFinished() {
+        return this.currentQuestionIndex === this.questions.length;
+      }
+
+      getTotalScore() {
+        return this.score;
+      }
+    }
+
+    const questions = [
+      new Question("What is the capital of France?", ["Paris", "London", "Berlin"], "Paris"),
+      new Question("What is the largest planet in our solar system?", ["Jupiter", "Mars", "Earth"], "Jupiter"),
+      new Question("Which of these is NOT a primary color?", ["Red", "Yellow", "Blue", "Purple"], "Purple"),
+      new Question("What is the capital of Spain?", ["Madrid", "Barcelona", "Valencia"], "Madrid")
+    ];
+
+    const quiz = new Quiz(questions);
+    const quizContainer = document.getElementById("quiz-container");
+
+    function displayQuestion() {
+      if (quiz.isFinished()) {
+        displayScore();
+      } else {
+        const currentQuestion = quiz.getCurrentQuestion();
+        const questionElement = document.createElement("div");
+        questionElement.className = "question";
+        questionElement.textContent = currentQuestion.text;
+
+        const choicesList = document.createElement("ul");
+        choicesList.className = "choices";
+
+        currentQuestion.choices.forEach((choice, index) => {
+          const choiceItem = document.createElement("li");
+          choiceItem.className = "choice";
+          const choiceButton = document.createElement("button");
+          choiceButton.textContent = choice;
+          choiceButton.onclick = () => {
+            quiz.guess(choice);
+            displayQuestion();
+          };
+          choiceItem.appendChild(choiceButton);
+          choicesList.appendChild(choiceItem);
+        });
+
+        quizContainer.innerHTML = "";
+        quizContainer.appendChild(questionElement);
+        quizContainer.appendChild(choicesList);
+      }
+    }
+
+    function displayScore() {
+      quizContainer.innerHTML = `<div class="score">Your final score is ${quiz.getTotalScore()} out of ${questions.length}</div>`;
+    }
+
+    displayQuestion();
+  </script>
+</body>
+</html>
